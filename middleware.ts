@@ -1,8 +1,8 @@
+import { auth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 import type { Session } from "next-auth";
 
 import { UserRole } from "./lib/generated/prisma/enums";
-import { authOptions } from "./lib/auth";
 
 /**
  * Middleware for authentication and authorization
@@ -62,9 +62,9 @@ const roleRouteAccess: Record<UserRole, string[]> = {
   ],
 };
 
-export default authOptions(
+export default auth(
   async (req: NextRequest & { auth: AuthSession | null }) => {
-    const session = req.auth;
+    const session = req.auth as AuthSession | null;
     const pathname = req.nextUrl.pathname;
 
     // Skip middleware for public routes

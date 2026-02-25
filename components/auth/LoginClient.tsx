@@ -3,15 +3,15 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { signIn } from "next-auth/react";
 
-import { Mail, Lock, AlertCircle, Loader2, Truck } from "lucide-react";
+import { Mail, Lock, AlertCircle, Loader2, Truck, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useAuth } from "@/lib/contexts/AuthContext";
 
 const demoAccounts = [
   { email: "superadmin@transithub.com", role: "Super Admin" },
@@ -22,24 +22,75 @@ const demoAccounts = [
 
 export function LoginClient() {
   const router = useRouter();
-  const { login } = useAuth();
   const [email, setEmail] = useState("admin@transithub.com");
   const [password, setPassword] = useState("password123");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  const [emailError, setEmailError] = useState("");
+
+  // Email validation
+  const validateEmail = (value: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(value);
+  };
+
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+    if (emailError && validateEmail(value)) {
+      setEmailError("");
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
+    setEmailError("");
     setLoading(true);
-    setTimeout(() => {
-      const ok = login(email, password);
-      setLoading(false);
-      if (ok) router.push("/");
-      else setError("Invalid email or password. Please try again.");
-    }, 500);
-  };
 
+    // Validation
+    if (!email.trim()) {
+      setEmailError("Email is required");
+      setLoading(false);
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      setEmailError("Please enter a valid email address");
+      setLoading(false);
+      return;
+    }
+
+    if (!password || password.trim().length === 0) {
+      setError("Password is required");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      // Call NextAuth signIn with credentials
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setError(result.error || "Invalid email or password. Please try again.");
+        setLoading(false);
+      } else if (result?.ok) {
+        setSuccess("Login successful! Redirecting to dashboard...");
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 1000);
+      }
+    } catch (err) {
+      setError("An error occurred during login. Please try again.");
+      console.error("Login error:", err);
+      setLoading(false);
+    }
+  };
   return (
     <div className="flex min-h-screen bg-background">
       {/* Left branding */}
@@ -104,6 +155,7 @@ export function LoginClient() {
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
+            {/* Email Field */}
             <div className="space-y-1.5">
               <Label
                 htmlFor="email"
@@ -117,14 +169,23 @@ export function LoginClient() {
                   id="email"
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => handleEmailChange(e.target.value)}
                   placeholder="name@example.com"
-                  className="pl-10"
+                  className={`pl-10 ${emailError ? "border-destructive focus-visible:ring-destructive" : ""}`}
                   required
+                  disabled={loading}
+                  aria-invalid={!!emailError}
+                  aria-describedby={emailError ? "email-error" : undefined}
                 />
               </div>
+              {emailError && (
+                <p id="email-error" className="text-xs text-destructive font-medium">
+                  {emailError}
+                </p>
+              )}
             </div>
 
+            {/* Password Field */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <Label
@@ -150,10 +211,13 @@ export function LoginClient() {
                   placeholder="••••••••"
                   className="pl-10"
                   required
+                  disabled={loading}
+                  aria-describedby={error ? "password-error" : undefined}
                 />
               </div>
             </div>
 
+            {/* Error Alert */}
             {error && (
               <Alert variant="destructive">
                 <AlertCircle className="size-4" />
@@ -161,12 +225,29 @@ export function LoginClient() {
               </Alert>
             )}
 
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading && <Loader2 className="size-4 animate-spin" />}
-              {loading ? "Signing in…" : "Sign In"}
+            {/* Success Alert */}
+            {success && (
+              <Alert className="border-green-200 bg-green-50">
+                <CheckCircle className="size-4 text-green-600" />
+                <AlertDescription className="text-green-800">
+                  {success}
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {/* Submit Button */}
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={loading}
+              size="lg"
+            >
+              {loading && <Loader2 className="mr-2 size-4 animate-spin" />}
+              {loading ? "Signing in…" : "Login"}
             </Button>
           </form>
 
+          {/* Info Card */}
           <Card className="mt-6 border-blue-200 bg-blue-50">
             <CardContent className="p-3">
               <p className="text-xs text-blue-700">
