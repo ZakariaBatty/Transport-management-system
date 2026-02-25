@@ -7,7 +7,6 @@ import {
   canAccessResource,
   isDataRestricted,
 } from "../helpers";
-import { UserRole } from "@prisma/client";
 
 /**
  * Authentication Service
@@ -27,7 +26,7 @@ export class AuthenticationService {
     confirmPassword: string;
     name: string;
     phone: string;
-    role: UserRole;
+    role: 'driver' | 'manager' | 'admin' | 'super_admin';
   }): Promise<{ success: boolean; userId: string; message: string }> {
     // Validate email
     if (!isValidEmail(data.email)) {
@@ -80,7 +79,7 @@ export class AuthenticationService {
   ): Promise<{
     userId: string;
     email: string;
-    role: UserRole;
+    role: 'driver' | 'manager' | 'admin' | 'super_admin';
     name: string;
     phone: string;
   }> {
@@ -96,13 +95,13 @@ export class AuthenticationService {
     }
 
     // Compare passwords
-    const isPasswordValid = await comparePasswords(password, user.password);
+    const isPasswordValid = await comparePasswords(password, user.password || '');
     if (!isPasswordValid) {
       throw new Error("Invalid credentials");
     }
 
     // Check if user is active
-    if (user.status !== "ACTIVE") {
+    if (user.status !== "active") {
       throw new Error("User account is inactive or suspended");
     }
 
@@ -151,7 +150,7 @@ export class AuthenticationService {
     // Verify current password
     const isCurrentPasswordValid = await comparePasswords(
       currentPassword,
-      user.password,
+      user.password || '',
     );
     if (!isCurrentPasswordValid) {
       throw new Error("Current password is incorrect");
@@ -221,8 +220,8 @@ export class RolePermissionService {
    * Check if user has permission to access a resource
    */
   checkResourceAccess(
-    userRole: UserRole,
-    requiredRole: UserRole | UserRole[],
+    userRole: 'driver' | 'manager' | 'admin' | 'super_admin',
+    requiredRole: ('driver' | 'manager' | 'admin' | 'super_admin') | ('driver' | 'manager' | 'admin' | 'super_admin')[],
   ): boolean {
     return canAccessResource(userRole, requiredRole);
   }
@@ -230,7 +229,7 @@ export class RolePermissionService {
   /**
    * Check if user is restricted to their own data
    */
-  isUserDataRestricted(userRole: UserRole): boolean {
+  isUserDataRestricted(userRole: 'driver' | 'manager' | 'admin' | 'super_admin'): boolean {
     return isDataRestricted(userRole);
   }
 
@@ -238,25 +237,25 @@ export class RolePermissionService {
    * Check if user can view another user's data
    */
   canViewUserData(
-    requestingUserRole: UserRole,
+    requestingUserRole: 'driver' | 'manager' | 'admin' | 'super_admin',
     targetUserId: string,
     requestingUserId: string,
   ): boolean {
     // Admins can view all users
     if (
-      requestingUserRole === UserRole.ADMIN ||
-      requestingUserRole === UserRole.SUPER_ADMIN
+      requestingUserRole === 'admin' ||
+      requestingUserRole === 'super_admin'
     ) {
       return true;
     }
 
     // Managers can view all users
-    if (requestingUserRole === UserRole.MANAGER) {
+    if (requestingUserRole === 'manager') {
       return true;
     }
 
     // Drivers can only view their own data
-    if (requestingUserRole === UserRole.DRIVER) {
+    if (requestingUserRole === 'driver') {
       return requestingUserId === targetUserId;
     }
 
@@ -266,12 +265,12 @@ export class RolePermissionService {
   /**
    * Get role display name
    */
-  getRoleDisplayName(role: UserRole): string {
-    const displayNames: Record<UserRole, string> = {
-      [UserRole.DRIVER]: "Driver",
-      [UserRole.MANAGER]: "Manager",
-      [UserRole.ADMIN]: "Administrator",
-      [UserRole.SUPER_ADMIN]: "Super Administrator",
+  getRoleDisplayName(role: 'driver' | 'manager' | 'admin' | 'super_admin'): string {
+    const displayNames: Record<'driver' | 'manager' | 'admin' | 'super_admin', string> = {
+      'driver': "Driver",
+      'manager': "Manager",
+      'admin': "Administrator",
+      'super_admin': "Super Administrator",
     };
     return displayNames[role];
   }
@@ -279,15 +278,15 @@ export class RolePermissionService {
   /**
    * Get all available roles (useful for dropdowns)
    */
-  getAvailableRoles(currentUserRole: UserRole): UserRole[] {
+  getAvailableRoles(currentUserRole: 'driver' | 'manager' | 'admin' | 'super_admin'): ('driver' | 'manager' | 'admin' | 'super_admin')[] {
     // Super admin can assign any role
-    if (currentUserRole === UserRole.SUPER_ADMIN) {
-      return [UserRole.DRIVER, UserRole.MANAGER, UserRole.ADMIN];
+    if (currentUserRole === 'super_admin') {
+      return ['driver', 'manager', 'admin'];
     }
 
     // Admin can assign driver and manager roles
-    if (currentUserRole === UserRole.ADMIN) {
-      return [UserRole.DRIVER, UserRole.MANAGER];
+    if (currentUserRole === 'admin') {
+      return ['driver', 'manager'];
     }
 
     // Other roles cannot assign roles

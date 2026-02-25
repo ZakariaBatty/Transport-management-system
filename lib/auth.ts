@@ -2,7 +2,6 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { authenticationService } from "./auth/services/auth.service";
 import { userRepository } from "./auth/repositories/user.repository";
-import { UserRole } from "./generated/prisma/enums";
 
 /**
  * NextAuth Configuration
@@ -87,7 +86,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
-        session.user.role = token.role as UserRole;
+        session.user.role = token.role as string;
         session.user.status = token.status as string;
         session.user.phone = token.phone as string;
         session.user.name = token.name as string;
