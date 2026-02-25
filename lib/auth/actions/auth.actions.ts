@@ -5,7 +5,6 @@ import {
   rolePermissionService,
 } from "../services/auth.service";
 import { userRepository } from "../repositories/user.repository";
-import { UserRole } from "@prisma/client";
 
 /**
  * Server Actions for Authentication
@@ -19,7 +18,7 @@ export interface RegisterFormData {
   confirmPassword: string;
   name: string;
   phone: string;
-  role?: UserRole;
+  role?: "driver" | "manager" | "admin" | "super_admin";
 }
 
 export interface LoginFormData {
@@ -43,7 +42,7 @@ export async function registerUserAction(
       confirmPassword: formData.confirmPassword,
       name: formData.name,
       phone: formData.phone,
-      role: formData.role || UserRole.DRIVER,
+      role: formData.role || "driver",
     });
 
     return {
@@ -65,7 +64,7 @@ export async function loginAction(formData: LoginFormData): Promise<{
   user?: {
     userId: string;
     email: string;
-    role: UserRole;
+    role: "driver" | "manager" | "admin" | "super_admin";
     name: string;
     phone: string;
   };
@@ -171,8 +170,16 @@ export async function checkEmailAvailabilityAction(
 
 export async function validateUserAccessAction(
   userId: string,
-  requiredRole: UserRole | UserRole[],
-): Promise<{ hasAccess: boolean; role?: UserRole }> {
+  requiredRole:
+    | "driver"
+    | "manager"
+    | "admin"
+    | "super_admin"
+    | ("driver" | "manager" | "admin" | "super_admin")[],
+): Promise<{
+  hasAccess: boolean;
+  role?: "driver" | "manager" | "admin" | "super_admin";
+}> {
   try {
     const user = await userRepository.findUserById(userId);
     if (!user) {
@@ -223,7 +230,7 @@ export async function canViewUserDataAction(
 }
 
 export async function getUserRoleDisplayNameAction(
-  role: UserRole,
+  role: "driver" | "manager" | "admin" | "super_admin",
 ): Promise<string> {
   return rolePermissionService.getRoleDisplayName(role);
 }
