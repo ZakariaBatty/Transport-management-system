@@ -35,18 +35,23 @@ export async function middleware(req: any) {
 }
 
 export const config = {
-  matcher: [
-    "/dashboard/:path*",
-    "/trips/:path*",
-    "/drivers/:path*",
-    "/vehicles/:path*",
-    "/maintenance/:path*",
-    "/reports/:path*",
-    "/settings/:path*",
-    "/users/:path*",
-    "/profile/:path*",
-    "/calendar/:path*",
-    "/audit-logs/:path*",
-    "/auth/:path*",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api).*)"],
 };
+
+// export const config = {
+//   matcher: [
+//     "/dashboard/:path*",
+//     "/trips/:path*",
+//     "/drivers/:path*",
+//     "/vehicles/:path*",
+//     "/maintenance/:path*",
+//     "/reports/:path*",
+//     "/settings/:path*",
+//     "/users/:path*",
+//     "/profile/:path*",
+//     "/calendar/:path*",
+//     "/audit-logs/:path*",
+//     "/auth/:path*",
+//     "/",
+//   ],
+// };

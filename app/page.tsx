@@ -1,5 +1,5 @@
 import { DashboardClient } from "@/components/dashboard/DashboardClient";
 
-export default function Dashboard() {
+export default async function Dashboard() {
   return <DashboardClient />;
 }

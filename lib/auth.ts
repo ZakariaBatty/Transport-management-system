@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { authenticationService } from "./auth/services/auth.service";
 import { userRepository } from "./auth/repositories/user.repository";
-import { UserRole } from "./generated/prisma/enums";
+import { UserRole } from "@prisma/client";
 
 /**
  * NextAuth Configuration
@@ -111,7 +111,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       console.log(`[Auth] User signed in: ${user.email}`);
     },
 
-    async signOut({ token }) {
+    async signOut({ token }: any) {
       console.log(`[Auth] User signed out: ${token?.email}`);
     },
   },
