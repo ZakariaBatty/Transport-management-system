@@ -1,5 +1,5 @@
-import prisma from "@/lib/db/client";
-import { User, UserRole, UserStatus } from "@/lib/generated/prisma/client";
+import { db } from "@/lib/db/client";
+import { User, UserRole, UserStatus } from "@prisma/client";
 
 /**
  * User Repository
@@ -18,7 +18,7 @@ export class UserRepository {
     phone: string;
     role: UserRole;
   }): Promise<User> {
-    return prisma.user.create({
+    return db.user.create({
       data: {
         email: data.email.toLowerCase(),
         password: data.password,
@@ -34,7 +34,7 @@ export class UserRepository {
    * Find a user by email address
    */
   async findUserByEmail(email: string): Promise<User | null> {
-    return prisma.user.findUnique({
+    return db.user.findUnique({
       where: { email: email.toLowerCase() },
     });
   }
@@ -43,7 +43,7 @@ export class UserRepository {
    * Find a user by ID
    */
   async findUserById(id: string): Promise<User | null> {
-    return prisma.user.findUnique({
+    return db.user.findUnique({
       where: { id },
     });
   }
@@ -58,7 +58,7 @@ export class UserRepository {
       })
     | null
   > {
-    return prisma.user.findUnique({
+    return db.user.findUnique({
       where: { email: email.toLowerCase() },
       include: {
         driver: true,
@@ -80,7 +80,7 @@ export class UserRepository {
       })
     | null
   > {
-    return prisma.user.findUnique({
+    return db.user.findUnique({
       where: { id },
       include: {
         driver: true,
@@ -105,7 +105,7 @@ export class UserRepository {
       status: UserStatus;
     }>,
   ): Promise<User> {
-    return prisma.user.update({
+    return db.user.update({
       where: { id },
       data: {
         ...(data.email && { email: data.email.toLowerCase() }),
@@ -118,7 +118,7 @@ export class UserRepository {
    * Update user password
    */
   async updateUserPassword(id: string, hashedPassword: string): Promise<User> {
-    return prisma.user.update({
+    return db.user.update({
       where: { id },
       data: { password: hashedPassword },
     });
@@ -128,7 +128,7 @@ export class UserRepository {
    * Change user status
    */
   async updateUserStatus(id: string, status: UserStatus): Promise<User> {
-    return prisma.user.update({
+    return db.user.update({
       where: { id },
       data: { status },
     });
@@ -138,7 +138,7 @@ export class UserRepository {
    * Check if email exists
    */
   async emailExists(email: string): Promise<boolean> {
-    const user = await prisma.user.findUnique({
+    const user = await db.user.findUnique({
       where: { email: email.toLowerCase() },
       select: { id: true },
     });
@@ -156,12 +156,12 @@ export class UserRepository {
     total: number;
   }> {
     const [users, total] = await Promise.all([
-      prisma.user.findMany({
+      db.user.findMany({
         take: limit,
         skip: offset,
         orderBy: { createdAt: "desc" },
       }),
-      prisma.user.count(),
+      db.user.count(),
     ]);
 
     return { users, total };
@@ -171,7 +171,7 @@ export class UserRepository {
    * Get users by role
    */
   async getUsersByRole(role: UserRole): Promise<User[]> {
-    return prisma.user.findMany({
+    return db.user.findMany({
       where: { role },
       orderBy: { createdAt: "desc" },
     });
@@ -181,7 +181,7 @@ export class UserRepository {
    * Get active users
    */
   async getActiveUsers(): Promise<User[]> {
-    return prisma.user.findMany({
+    return db.user.findMany({
       where: { status: UserStatus.ACTIVE },
       orderBy: { createdAt: "desc" },
     });
@@ -191,7 +191,7 @@ export class UserRepository {
    * Delete a user (soft delete via status)
    */
   async deleteUser(id: string): Promise<User> {
-    return prisma.user.update({
+    return db.user.update({
       where: { id },
       data: { status: UserStatus.INACTIVE },
     });

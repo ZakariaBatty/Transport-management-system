@@ -1,5 +1,5 @@
+import { UserRole } from "@prisma/client";
 import bcryptjs from "bcryptjs";
-import { UserRole } from "../generated/prisma/enums";
 
 /**
  * Hash a password using bcryptjs

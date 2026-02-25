@@ -5,7 +5,7 @@ import {
   rolePermissionService,
 } from "../services/auth.service";
 import { userRepository } from "../repositories/user.repository";
-import { UserRole } from "@/lib/generated/prisma/enums";
+import { UserRole } from "@prisma/client";
 
 /**
  * Server Actions for Authentication

@@ -2,7 +2,7 @@ import React from "react";
 import { useSession, signOut as nextAuthSignOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import type { Session } from "next-auth";
-import { UserRole } from "../generated/prisma/enums";
+import { UserRole } from "@prisma/client";
 
 /**
  * Custom hook to access session with typed user

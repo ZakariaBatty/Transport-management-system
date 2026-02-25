@@ -7,7 +7,7 @@ import {
   canAccessResource,
   isDataRestricted,
 } from "../helpers";
-import { UserRole } from "@/lib/generated/prisma/enums";
+import { UserRole } from "@prisma/client";
 
 /**
  * Authentication Service
