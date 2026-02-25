@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { SessionProvider } from 'next-auth/react'
 import { RootLayoutClient } from '@/components/RootLayoutClient'
 import './globals.css'
 
@@ -38,9 +39,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-sans antialiased bg-white">
-        <RootLayoutClient>
-          {children}
-        </RootLayoutClient>
+        <SessionProvider>
+          <RootLayoutClient>
+            {children}
+          </RootLayoutClient>
+        </SessionProvider>
         <Analytics />
       </body>
     </html>

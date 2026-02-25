@@ -2,25 +2,25 @@
 
 import React, { ReactNode, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/lib/contexts/AuthContext";
+import { useSession } from "next-auth/react";
 import { Loader } from "lucide-react";
 
 export function ProtectedRoute({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const { isAuthenticated, isLoading } = useAuth();
+  const { status } = useSession();
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    if (isLoading) return;
+    if (status === "loading") return;
 
-    if (!isAuthenticated) {
+    if (status === "unauthenticated") {
       router.push("/auth/login");
-    } else {
+    } else if (status === "authenticated") {
       setIsReady(true);
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [status, router]);
 
-  if (isLoading || !isReady) {
+  if (status === "loading" || !isReady) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-white">
         <div className="flex flex-col items-center gap-4">

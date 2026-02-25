@@ -6,14 +6,18 @@ import React, {
   useState,
   useEffect,
   ReactNode,
+  useCallback,
 } from "react";
-import { User, users as allUsers } from "@/lib/data/users";
+import { useSession, signIn, signOut } from "next-auth/react";
+import { Session } from "next-auth";
+import { User } from "@/lib/data/users";
 
 interface AuthContextType {
   user: User | null;
+  session: Session | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => boolean;
-  logout: () => void;
+  login: (email: string, password: string) => Promise<boolean>;
+  logout: () => Promise<void>;
   resetPassword: (email: string, newPassword: string) => boolean;
   isLoading: boolean;
 }
@@ -21,67 +25,60 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const { data: session, status } = useSession();
   const [isLoading, setIsLoading] = useState(true);
 
-  // Initialize from localStorage on mount
+  // Update loading state based on session status
   useEffect(() => {
-    const storedUser = localStorage.getItem("transithub_user");
-    if (storedUser) {
+    setIsLoading(status === "loading");
+  }, [status]);
+
+  const login = useCallback(
+    async (email: string, password: string): Promise<boolean> => {
       try {
-        setUser(JSON.parse(storedUser));
+        const result = await signIn("credentials", {
+          email,
+          password,
+          redirect: false,
+        });
+        return result?.ok ?? false;
       } catch (error) {
-        console.error("Failed to parse stored user:", error);
-        localStorage.removeItem("transithub_user");
+        console.error("Login error:", error);
+        return false;
       }
-    }
-    setIsLoading(false);
+    },
+    [],
+  );
+
+  const logout = useCallback(async () => {
+    await signOut({ redirect: false });
   }, []);
-
-  const login = (email: string, password: string): boolean => {
-    const foundUser = allUsers.find(
-      (u) => u.email === email && u.password === password,
-    );
-
-    if (foundUser) {
-      const userWithoutPassword = { ...foundUser };
-      delete (userWithoutPassword as any).password;
-
-      setUser(userWithoutPassword as User);
-      localStorage.setItem(
-        "transithub_user",
-        JSON.stringify(userWithoutPassword),
-      );
-      return true;
-    }
-    return false;
-  };
-
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("transithub_user");
-  };
 
   const resetPassword = (email: string, newPassword: string): boolean => {
     // This is just for demo - in real app, would call API
-    const foundUser = allUsers.find((u) => u.email === email);
-    if (foundUser) {
-      foundUser.password = newPassword;
-      if (user?.email === email) {
-        const updatedUser = { ...user };
-        setUser(updatedUser);
-        localStorage.setItem("transithub_user", JSON.stringify(updatedUser));
-      }
-      return true;
-    }
+    // For now, kept as placeholder since it's tied to fake JSON DB
+    console.warn("resetPassword called but not fully integrated with NextAuth");
     return false;
   };
+
+  // Convert session user to User format
+  const user: User | null =
+    session?.user && status === "authenticated"
+      ? ({
+          id: session.user.id || "",
+          email: session.user.email || "",
+          name: session.user.name || "",
+          phone: (session.user as any).phone || "",
+          role: (session.user as any).role || "DRIVER",
+        } as User)
+      : null;
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        isAuthenticated: !!user,
+        session,
+        isAuthenticated: status === "authenticated",
         login,
         logout,
         resetPassword,
