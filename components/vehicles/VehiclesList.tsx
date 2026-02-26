@@ -1,33 +1,34 @@
-'use client'
+"use client";
 
-import React from 'react'
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { VehicleStatusBadge } from '@/components/shared'
-import { Trash2, Edit2 } from 'lucide-react'
-import { deleteVehicleAction } from '@/app/vehicles/actions'
+import React from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { VehicleStatusBadge } from "@/components/shared";
+import { Trash2, Edit2 } from "lucide-react";
+import { deleteVehicleAction } from "@/lib/vehicles/actions/vehicle.actions";
+import { VehicleStatus } from "@/lib/data";
 
 interface Vehicle {
-  id: string
-  model: string
-  plate: string
-  vin: string
-  registrationExpiry: Date | string
-  capacity: number
-  kmUsage: number
-  monthlyRent: number
-  salik: number
-  owner?: string
-  status: string
-  lastMaintenance?: Date | string
-  assignments?: any[]
+  id: string;
+  model: string;
+  plate: string;
+  vin: string;
+  registrationExpiry: Date | string;
+  capacity: number;
+  kmUsage: number;
+  monthlyRent: number;
+  salik: number;
+  owner?: string;
+  status: VehicleStatus;
+  lastMaintenance?: Date | string;
+  assignments?: any[];
 }
 
 interface VehiclesListProps {
-  vehicles: Vehicle[]
-  userRole: string
-  onEdit: (vehicle: Vehicle) => void
-  onRefresh: () => void
+  vehicles: Vehicle[];
+  userRole: string;
+  onEdit: (vehicle: Vehicle) => void;
+  onRefresh: () => void;
 }
 
 export function VehiclesList({
@@ -36,24 +37,24 @@ export function VehiclesList({
   onEdit,
   onRefresh,
 }: VehiclesListProps) {
-  const canManage = ['manager', 'admin', 'super_admin'].includes(userRole)
+  const canManage = ["MANAGER", "ADMIN", "SUPER_ADMIN"].includes(userRole);
 
   const handleDelete = async (vehicleId: string) => {
-    if (!window.confirm('Are you sure you want to delete this vehicle?')) {
-      return
+    if (!window.confirm("Are you sure you want to delete this vehicle?")) {
+      return;
     }
 
     try {
-      const result = await deleteVehicleAction(vehicleId)
+      const result = await deleteVehicleAction(vehicleId);
       if (result.success) {
-        onRefresh()
+        onRefresh();
       } else {
-        alert(result.error || 'Failed to delete vehicle')
+        alert(result.error || "Failed to delete vehicle");
       }
     } catch (error) {
-      alert('An error occurred while deleting the vehicle')
+      alert("An error occurred while deleting the vehicle");
     }
-  }
+  };
 
   if (vehicles.length === 0) {
     return (
@@ -62,7 +63,7 @@ export function VehiclesList({
           <p className="text-muted-foreground">No vehicles found</p>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
@@ -72,18 +73,18 @@ export function VehiclesList({
           <thead>
             <tr className="bg-muted/40 text-[11px] font-bold uppercase tracking-wide text-muted-foreground border-b">
               {[
-                'Plate',
-                'Model',
-                'VIN',
-                'Capacity',
-                'KM Usage',
-                'Monthly Rent',
-                'Salik',
-                'Owner',
-                'Reg. Expiry',
-                'Status',
-                ...(canManage ? ['Actions'] : []),
-              ].map(h => (
+                "Plate",
+                "Model",
+                "VIN",
+                "Capacity",
+                "KM Usage",
+                "Monthly Rent",
+                "Salik",
+                "Owner",
+                "Reg. Expiry",
+                "Status",
+                ...(canManage ? ["Actions"] : []),
+              ].map((h) => (
                 <th key={h} className="whitespace-nowrap px-4 py-2.5 text-left">
                   {h}
                 </th>
@@ -91,8 +92,11 @@ export function VehiclesList({
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {vehicles.map(vehicle => (
-              <tr key={vehicle.id} className="transition-colors hover:bg-muted/30">
+            {vehicles.map((vehicle) => (
+              <tr
+                key={vehicle.id}
+                className="transition-colors hover:bg-muted/30"
+              >
                 <td className="px-4 py-3 font-mono text-xs font-bold text-primary">
                   {vehicle.plate}
                 </td>
@@ -111,12 +115,12 @@ export function VehiclesList({
                   AED {vehicle.salik.toLocaleString()}
                 </td>
                 <td className="px-4 py-3 text-muted-foreground text-xs">
-                  {vehicle.owner ?? '—'}
+                  {vehicle.owner ?? "—"}
                 </td>
                 <td className="px-4 py-3 font-mono text-xs">
                   {vehicle.registrationExpiry
                     ? new Date(vehicle.registrationExpiry).toLocaleDateString()
-                    : '—'}
+                    : "—"}
                 </td>
                 <td className="px-4 py-3">
                   <VehicleStatusBadge status={vehicle.status} />
@@ -149,5 +153,5 @@ export function VehiclesList({
         </table>
       </CardContent>
     </Card>
-  )
+  );
 }

@@ -1,21 +1,21 @@
-'use client'
+"use client";
 
-import React from 'react'
-import { Button } from '@/components/ui/button'
-import { StatCard } from '@/components/shared'
-import { Truck, AlertCircle, Wrench, Power } from 'lucide-react'
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { StatCard } from "@/components/shared";
+import { Truck, AlertCircle, Wrench, Power } from "lucide-react";
 
 interface VehicleStats {
-  totalVehicles: number
-  availableVehicles: number
-  inUseVehicles: number
-  maintenanceVehicles: number
+  totalVehicles: number;
+  availableVehicles: number;
+  inUseVehicles: number;
+  maintenanceVehicles: number;
 }
 
 interface VehiclesHeaderProps {
-  stats?: VehicleStats
-  userRole: string
-  onCreateClick: () => void
+  stats?: VehicleStats;
+  userRole: string;
+  onCreateClick: () => void;
 }
 
 export function VehiclesHeader({
@@ -23,7 +23,7 @@ export function VehiclesHeader({
   userRole,
   onCreateClick,
 }: VehiclesHeaderProps) {
-  const canCreate = ['manager', 'admin', 'super_admin'].includes(userRole)
+  const canCreate = ["MANAGER", "ADMIN", "SUPER_ADMIN"].includes(userRole);
 
   return (
     <div className="mb-8">
@@ -71,5 +71,5 @@ export function VehiclesHeader({
         />
       </div>
     </div>
-  )
+  );
 }
