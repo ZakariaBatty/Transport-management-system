@@ -1,5 +1,3 @@
-"use client";
-
 import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { VehiclesContainer } from '@/components/vehicles/VehiclesContainer'
@@ -20,4 +18,3 @@ export default async function VehiclesPage() {
   // Only authenticated users can access vehicles
   return <VehiclesContainer />
 }
-
