@@ -91,7 +91,7 @@ export function LoginClient() {
       } else if (result?.ok) {
         setSuccess("Login successful! Redirecting to dashboard...");
         setTimeout(() => {
-          router.push("/dashboard");
+          router.push("/");
         }, 1000);
       }
     } catch (err) {

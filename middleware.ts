@@ -1,34 +1,20 @@
-import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
+import { auth } from "./lib/auth";
 
-const publicRoutes = [
-  "/auth/login",
-  "/auth/forgot-password",
-  "/auth/verify-code",
-  "/auth/reset-password",
-];
+const publicRoutes = ["/auth/login", "/auth/forgot-password"];
 
 export async function middleware(req: any) {
-  const url = req.nextUrl.clone();
-  const pathname = url.pathname;
+  const session = await auth();
+  const pathname = req.nextUrl.pathname;
 
   const isPublic = publicRoutes.some((r) => pathname.startsWith(r));
 
-  // Get JWT token from request
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-
-  const isAuth = !!token;
-
-  // Redirect logged-in users away from public auth pages
-  if (isAuth && isPublic && pathname !== "/unauthorized") {
-    url.pathname = "/";
-    return NextResponse.redirect(url);
+  if (!session && !isPublic) {
+    return NextResponse.redirect(new URL("/auth/login", req.url));
   }
 
-  // Redirect non-authenticated users to login
-  if (!isPublic && !isAuth) {
-    url.pathname = "/auth/login";
-    return NextResponse.redirect(url);
+  if (session && isPublic) {
+    return NextResponse.redirect(new URL("/", req.url));
   }
 
   return NextResponse.next();
@@ -37,21 +23,3 @@ export async function middleware(req: any) {
 export const config = {
   matcher: ["/((?!_next/static|_next/image|favicon.ico|api).*)"],
 };
-
-// export const config = {
-//   matcher: [
-//     "/dashboard/:path*",
-//     "/trips/:path*",
-//     "/drivers/:path*",
-//     "/vehicles/:path*",
-//     "/maintenance/:path*",
-//     "/reports/:path*",
-//     "/settings/:path*",
-//     "/users/:path*",
-//     "/profile/:path*",
-//     "/calendar/:path*",
-//     "/audit-logs/:path*",
-//     "/auth/:path*",
-//     "/",
-//   ],
-// };
