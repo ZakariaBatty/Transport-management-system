@@ -30,7 +30,7 @@ const demoAccounts = [
 export function LoginClient() {
   const router = useRouter();
   const [email, setEmail] = useState("admin@transithub.com");
-  const [password, setPassword] = useState("password123");
+  const [password, setPassword] = useState("Passwor@d123");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
