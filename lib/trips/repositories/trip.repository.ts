@@ -1,5 +1,5 @@
-import { prisma } from '@/lib/db/client'
-import { Prisma, TripStatus, TripType } from '@prisma/client'
+import { prisma } from "@/lib/db/client";
+import { Prisma, TripStatus, TripType } from "@prisma/client";
 
 /**
  * Trip Repository
@@ -16,8 +16,8 @@ export const tripRepository = {
   async findTripsForUser(userId: string, userRole: string) {
     const where: Prisma.TripWhereInput = {
       deletedAt: null,
-      ...(userRole === 'driver' && { driverId: userId }),
-    }
+      ...(userRole === "DRIVER" && { driverId: userId }),
+    };
 
     return prisma.trip.findMany({
       where,
@@ -33,8 +33,8 @@ export const tripRepository = {
         hotel: { select: { id: true, name: true } },
         images: true,
       },
-      orderBy: { tripDate: 'desc' },
-    })
+      orderBy: { tripDate: "desc" },
+    });
   },
 
   /**
@@ -47,7 +47,9 @@ export const tripRepository = {
         driver: {
           select: {
             id: true,
-            user: { select: { id: true, name: true, email: true, phone: true } },
+            user: {
+              select: { id: true, name: true, email: true, phone: true },
+            },
           },
         },
         vehicle: { select: { id: true, plate: true, model: true } },
@@ -58,7 +60,7 @@ export const tripRepository = {
           include: { assignedByUser: { select: { id: true, name: true } } },
         },
       },
-    })
+    });
   },
 
   /**
@@ -78,7 +80,7 @@ export const tripRepository = {
         agency: { select: { id: true, name: true } },
         hotel: { select: { id: true, name: true } },
       },
-    })
+    });
   },
 
   /**
@@ -99,7 +101,7 @@ export const tripRepository = {
         agency: { select: { id: true, name: true } },
         hotel: { select: { id: true, name: true } },
       },
-    })
+    });
   },
 
   /**
@@ -109,7 +111,7 @@ export const tripRepository = {
     return prisma.trip.update({
       where: { id: tripId },
       data: { deletedAt: new Date() },
-    })
+    });
   },
 
   /**
@@ -119,8 +121,8 @@ export const tripRepository = {
     return prisma.agency.findMany({
       where: { deletedAt: null },
       select: { id: true, name: true },
-      orderBy: { name: 'asc' },
-    })
+      orderBy: { name: "asc" },
+    });
   },
 
   /**
@@ -130,8 +132,8 @@ export const tripRepository = {
     return prisma.hotel.findMany({
       where: { deletedAt: null },
       select: { id: true, name: true, city: true },
-      orderBy: { name: 'asc' },
-    })
+      orderBy: { name: "asc" },
+    });
   },
 
   /**
@@ -143,8 +145,8 @@ export const tripRepository = {
       include: {
         user: { select: { id: true, name: true, email: true } },
       },
-      orderBy: { user: { name: 'asc' } },
-    })
+      orderBy: { user: { name: "asc" } },
+    });
   },
 
   /**
@@ -154,8 +156,8 @@ export const tripRepository = {
     return prisma.vehicle.findMany({
       where: { deletedAt: null },
       select: { id: true, plate: true, model: true, status: true },
-      orderBy: { plate: 'asc' },
-    })
+      orderBy: { plate: "asc" },
+    });
   },
 
   /**
@@ -164,23 +166,23 @@ export const tripRepository = {
   async getTripStats(userRole: string, userId?: string) {
     const where: Prisma.TripWhereInput = {
       deletedAt: null,
-      ...(userRole === 'driver' && userId && { driverId: userId }),
-    }
+      ...(userRole === "DRIVER" && userId && { driverId: userId }),
+    };
 
     const [totalTrips, completedTrips, inProgressTrips, scheduledTrips] =
       await Promise.all([
         prisma.trip.count({ where }),
-        prisma.trip.count({ where: { ...where, status: 'COMPLETED' } }),
-        prisma.trip.count({ where: { ...where, status: 'IN_PROGRESS' } }),
-        prisma.trip.count({ where: { ...where, status: 'SCHEDULED' } }),
-      ])
+        prisma.trip.count({ where: { ...where, status: "COMPLETED" } }),
+        prisma.trip.count({ where: { ...where, status: "IN_PROGRESS" } }),
+        prisma.trip.count({ where: { ...where, status: "SCHEDULED" } }),
+      ]);
 
     return {
       totalTrips,
       completedTrips,
       inProgressTrips,
       scheduledTrips,
-    }
+    };
   },
 
   /**
@@ -189,14 +191,14 @@ export const tripRepository = {
   async getTotalPassengers(userRole: string, userId?: string) {
     const where: Prisma.TripWhereInput = {
       deletedAt: null,
-      ...(userRole === 'driver' && userId && { driverId: userId }),
-    }
+      ...(userRole === "DRIVER" && userId && { driverId: userId }),
+    };
 
     const result = await prisma.trip.aggregate({
       where,
       _sum: { passengersCount: true },
-    })
+    });
 
-    return result._sum.passengersCount ?? 0
+    return result._sum.passengersCount ?? 0;
   },
-}
+};
