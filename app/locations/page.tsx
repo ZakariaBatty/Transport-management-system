@@ -1,52 +1,23 @@
-"use client";
+import { auth } from '@/lib/auth'
+import { redirect } from 'next/navigation'
+import { LocationsContainer } from '@/components/locations/LocationsContainer'
 
-import React, { useState } from "react";
-import { Plus, Edit2, Trash2, Eye, Building2, HotelIcon } from "lucide-react";
-import { useCrudState } from "@/hooks/useCrudState";
-import { Drawer } from "@/components/Drawer";
-import { ConfirmDialog } from "@/components/ConfirmDialog";
-import { FormField } from "@/components/FormField";
-import {
-  Agency,
-  Hotel,
-  agencies as initialAgencies,
-  hotels as initialHotels,
-} from "@/lib/data/indexold";
+export const metadata = {
+  title: 'Locations - TransitHub',
+  description: 'Manage agencies and hotels',
+}
 
-export default function LocationsPage() {
-  const [activeTab, setActiveTab] = useState<"agencies" | "hotels">("agencies");
-  const [agencyState, agencyActions] = useCrudState<Agency>(initialAgencies);
-  const [hotelState, hotelActions] = useCrudState<Hotel>(initialHotels);
-  const [agencyForm, setAgencyForm] = useState<Agency | null>(null);
-  const [hotelForm, setHotelForm] = useState<Hotel | null>(null);
+export default async function LocationsPage() {
+  const session = await auth()
 
-  // Agency handlers
-  const handleCreateAgency = () => {
-    setAgencyForm(null);
-    agencyActions.openCreateDrawer();
-  };
+  // Redirect if not authenticated
+  if (!session?.user?.id) {
+    redirect('/auth/login')
+  }
 
-  const handleEditAgency = (agency: Agency) => {
-    setAgencyForm({ ...agency });
-    agencyActions.openEditDrawer(agency);
-  };
-
-  const handleViewAgency = (agency: Agency) => {
-    setAgencyForm(agency);
-    agencyActions.openViewDrawer(agency);
-  };
-
-  const handleSaveAgency = () => {
-    if (!agencyForm) return;
-    if (agencyState.mode === "create") {
-      const newAgency: Agency = {
-        ...agencyForm,
-        id: String(Date.now()),
-      };
-      agencyActions.createItem(newAgency);
-    } else {
-      agencyActions.updateItem(agencyForm);
-    }
+  // Only authenticated users can access locations
+  return <LocationsContainer />
+}
   };
 
   // Hotel handlers
