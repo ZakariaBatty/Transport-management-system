@@ -1,5 +1,4 @@
-import { auth } from "@/lib/auth";
-import { redirect } from "next/navigation";
+import { ensureManager } from "@/lib/auth/guards";
 import { VehiclesContainer } from "@/components/vehicles/VehiclesContainer";
 
 export const metadata = {
@@ -8,13 +7,8 @@ export const metadata = {
 };
 
 export default async function VehiclesPage() {
-  const session = await auth();
+  // Ensure user is authenticated and has manager role or higher
+  await ensureManager();
 
-  // Redirect if not authenticated
-  if (!session?.user?.id) {
-    redirect("/auth/login");
-  }
-
-  // Only authenticated users can access vehicles
   return <VehiclesContainer />;
 }

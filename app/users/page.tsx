@@ -1,6 +1,5 @@
+import { ensureAdmin } from "@/lib/auth/guards";
 import { UsersContainer } from "@/components/user/UsersContainer";
-import { auth } from "@/lib/auth";
-import { redirect } from "next/navigation";
 
 export const metadata = {
   title: "Users - TransitHub",
@@ -8,18 +7,8 @@ export const metadata = {
 };
 
 export default async function UsersPage() {
-  const session = await auth();
+  // Ensure user is authenticated and has admin role or higher
+  await ensureAdmin();
 
-  // Redirect if not authenticated
-  if (!session?.user?.id) {
-    redirect("/auth/login");
-  }
-
-  // Only admin and super admin can access users page
-  if (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN") {
-    redirect("/dashboard");
-  }
-
-  // Render the client component
   return <UsersContainer />;
 }

@@ -43,17 +43,37 @@ const navItems = [
     icon: LayoutDashboard,
     roles: ["DRIVER", "MANAGER", "ADMIN", "SUPER_ADMIN"],
   },
+  // Driver-only routes
+  {
+    href: "/driver/trips",
+    label: "My Trips",
+    icon: MapPin,
+    roles: ["DRIVER"],
+  },
+  {
+    href: "/driver/vehicle",
+    label: "My Vehicle",
+    icon: Truck,
+    roles: ["DRIVER"],
+  },
+  {
+    href: "/driver/calendar",
+    label: "Calendar",
+    icon: Calendar,
+    roles: ["DRIVER"],
+  },
+  // Admin routes
   {
     href: "/trips",
     label: "Trips",
     icon: MapPin,
-    roles: ["DRIVER", "MANAGER", "ADMIN", "SUPER_ADMIN"],
+    roles: ["MANAGER", "ADMIN", "SUPER_ADMIN"],
   },
   {
     href: "/drivers",
     label: "Drivers",
     icon: Users,
-    roles: ["DRIVER", "MANAGER", "ADMIN", "SUPER_ADMIN"],
+    roles: ["MANAGER", "ADMIN", "SUPER_ADMIN"],
   },
   {
     href: "/vehicles",
@@ -79,12 +99,6 @@ const navItems = [
     label: "Reports",
     icon: BarChart3,
     roles: ["MANAGER", "ADMIN", "SUPER_ADMIN"],
-  },
-  {
-    href: "/calendar",
-    label: "Calendar",
-    icon: Calendar,
-    roles: ["DRIVER", "MANAGER", "ADMIN", "SUPER_ADMIN"],
   },
   {
     href: "/users",

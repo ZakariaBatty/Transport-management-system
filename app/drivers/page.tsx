@@ -1,6 +1,5 @@
+import { ensureManager } from "@/lib/auth/guards";
 import { DriversContainer } from "@/components/driver/DriversContainer";
-import { auth } from "@/lib/auth";
-import { redirect } from "next/navigation";
 
 export const metadata = {
   title: "Drivers - TransitHub",
@@ -8,13 +7,8 @@ export const metadata = {
 };
 
 export default async function DriversPage() {
-  const session = await auth();
+  // Ensure user is authenticated and has manager role or higher
+  await ensureManager();
 
-  // Redirect if not authenticated
-  if (!session?.user?.id) {
-    redirect("/auth/login");
-  }
-
-  // Only authenticated users can access drivers
   return <DriversContainer />;
 }
