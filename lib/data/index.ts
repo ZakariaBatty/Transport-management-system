@@ -17,7 +17,7 @@ export type MaintenanceType =
   | "tire-replacement"
   | "brake-service";
 export type UserRole = "DRIVER" | "MANAGER" | "ADMIN" | "SUPER_ADMIN";
-export type UserStatus = "active" | "inactive" | "suspended";
+export type UserStatus = "ACTIVE" | "INACTIVE" | "SUSPENDED";
 
 export interface Driver {
   id: string;
@@ -599,7 +599,7 @@ export const users: User[] = [
     password: "password123",
     phone: "+1-555-0101",
     role: "ADMIN",
-    status: "active",
+    status: "ACTIVE",
     department: "Operations",
     createdAt: "2025-01-15",
     lastLogin: "2026-02-21",
@@ -611,7 +611,7 @@ export const users: User[] = [
     password: "password123",
     phone: "+1-555-0102",
     role: "SUPER_ADMIN",
-    status: "active",
+    status: "ACTIVE",
     department: "Management",
     createdAt: "2024-01-01",
     lastLogin: "2026-02-21",
@@ -623,7 +623,7 @@ export const users: User[] = [
     password: "password123",
     phone: "+1-555-0103",
     role: "MANAGER",
-    status: "active",
+    status: "ACTIVE",
     department: "Operations",
     createdAt: "2025-03-10",
     lastLogin: "2026-02-20",
@@ -635,7 +635,7 @@ export const users: User[] = [
     password: "password123",
     phone: "+212 6 12 34 56 78",
     role: "DRIVER",
-    status: "active",
+    status: "ACTIVE",
     assignedVehicle: "HY-2025-A",
     createdAt: "2024-06-01",
     lastLogin: "2026-02-19",
@@ -647,7 +647,7 @@ export const users: User[] = [
     password: "password123",
     phone: "+212 6 98 76 54 32",
     role: "DRIVER",
-    status: "active",
+    status: "ACTIVE",
     assignedVehicle: "MB-2024-B",
     createdAt: "2024-07-12",
     lastLogin: "2026-02-19",
@@ -659,7 +659,7 @@ export const users: User[] = [
     password: "password123",
     phone: "+212 6 11 22 33 44",
     role: "DRIVER",
-    status: "active",
+    status: "ACTIVE",
     createdAt: "2024-08-20",
     lastLogin: "2026-02-18",
   },
@@ -670,7 +670,7 @@ export const users: User[] = [
     password: "password123",
     phone: "+212 6 55 66 77 88",
     role: "DRIVER",
-    status: "active",
+    status: "ACTIVE",
     assignedVehicle: "TY-2024-C",
     createdAt: "2024-09-01",
     lastLogin: "2026-02-17",
@@ -682,7 +682,7 @@ export const users: User[] = [
     password: "password123",
     phone: "+212 6 22 33 44 55",
     role: "MANAGER",
-    status: "active",
+    status: "ACTIVE",
     department: "Fleet Management",
     createdAt: "2025-02-01",
     lastLogin: "2026-02-21",
@@ -694,7 +694,7 @@ export const users: User[] = [
     password: "password123",
     phone: "+212 6 77 88 99 00",
     role: "ADMIN",
-    status: "active",
+    status: "ACTIVE",
     department: "Administration",
     createdAt: "2025-01-20",
     lastLogin: "2026-02-19",
@@ -706,7 +706,7 @@ export const users: User[] = [
     password: "password123",
     phone: "+212 6 33 44 55 66",
     role: "DRIVER",
-    status: "inactive",
+    status: "INACTIVE",
     createdAt: "2024-10-15",
     lastLogin: "2026-01-20",
   },

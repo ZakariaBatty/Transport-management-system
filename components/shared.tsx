@@ -248,16 +248,16 @@ export function RoleBadge({ role }: { role: UserRole }) {
 
 export function UserStatusBadge({ status }: { status: UserStatus }) {
   const map: Record<UserStatus, { label: string; className: string }> = {
-    active: {
-      label: "Active",
+    ACTIVE: {
+      label: "ACTIVE",
       className: "bg-emerald-50 text-emerald-700 border-emerald-200",
     },
-    inactive: {
-      label: "Inactive",
+    INACTIVE: {
+      label: "INACTIVE",
       className: "bg-slate-100 text-slate-600 border-slate-200",
     },
-    suspended: {
-      label: "Suspended",
+    SUSPENDED: {
+      label: "SUSPENDED",
       className: "bg-red-50 text-red-700 border-red-200",
     },
   };
